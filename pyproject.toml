@@ -1,0 +1,44 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dmlearn"
+version = "2025.0.1"
+description = "Fundamental machine learning utility package"
+authors = [{name = "Miroslav Dzhokanov"}]
+dependencies = [
+  "numpy"
+]
+requires-python = ">=3.0"
+readme = "README.md"
+maintainers = [
+    {name = "Miroslav Dzhokanov", email="m@dzho.km"},
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    'Intended Audience :: Science/Research',
+    'Intended Audience :: Developers',
+    'Programming Language :: Python',
+    'Programming Language :: Python :: 3',
+    'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12',
+    'Programming Language :: Python :: 3.13',
+    'Programming Language :: Python :: 3.14',
+    'Programming Language :: Python :: 3 :: Only',
+    'Topic :: Software Development',
+    'Topic :: Scientific/Engineering',
+    'Typing :: Typed',
+    'Operating System :: Microsoft :: Windows',
+    'Operating System :: POSIX',
+    'Operating System :: Unix',
+    'Operating System :: MacOS',
+]
+license = "MIT"
+license-files = ['LICENSE']
+keywords = ["machine learning", "deep learning", "neural network", "utility"]
+
+[project.urls]
+source = "https://github.com/dzhokn/dmlearn"
+download = "https://pypi.org/project/dmlearn/#files"
+tracker = "https://github.com/dzhokn/dmlearn/issues"
