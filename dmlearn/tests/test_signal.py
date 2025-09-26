@@ -11,7 +11,7 @@ def test_pad_tensor_2D_offset_1():
         [0, 3, 4, 0],
         [0, 0, 0, 0]
     ])
-    padded_2d = pad_tensor(tensor_2d, padding_offset=1)
+    padded_2d = pad_tensor(tensor_2d, padding=1)
     np.testing.assert_array_equal(padded_2d, expected_2d)
 
 def test_pad_tensor_2D_offset_2():
@@ -25,7 +25,7 @@ def test_pad_tensor_2D_offset_2():
         [0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0]
     ])
-    padded_2d_custom = pad_tensor(tensor_2d, padding_offset=2)
+    padded_2d_custom = pad_tensor(tensor_2d, padding=2)
     np.testing.assert_array_equal(padded_2d_custom, expected_2d_custom)
 
 def test_pad_tensor_2D_padding_fill_value_9():
@@ -38,7 +38,7 @@ def test_pad_tensor_2D_padding_fill_value_9():
         [9, 9, 9, 9, 9, 9],
         [9, 9, 9, 9, 9, 9]
     ])
-    padded_2d_custom = pad_tensor(tensor_2d, padding_offset=2, padding_fill_value=9)
+    padded_2d_custom = pad_tensor(tensor_2d, padding=2, fill_value=9)
     np.testing.assert_array_equal(padded_2d_custom, expected_2d_custom)
 
 def test_pad_tensor_3D_offset_1():
@@ -49,7 +49,7 @@ def test_pad_tensor_3D_offset_1():
         [[0, 0, 0, 0], [0, 5, 6, 0], [0, 7, 8, 0], [0, 0, 0, 0]],
         [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]
     ])
-    padded_3d = pad_tensor(tensor_3d, padding_offset=1)
+    padded_3d = pad_tensor(tensor_3d, padding=1)
     np.testing.assert_array_equal(padded_3d, expected_3d)
 
 def test_pad_tensor_3D_offset_2():
@@ -62,7 +62,7 @@ def test_pad_tensor_3D_offset_2():
         [[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]],
         [[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]]
     ])
-    padded_3d = pad_tensor(tensor_3d, padding_offset=2)
+    padded_3d = pad_tensor(tensor_3d, padding=2)
     np.testing.assert_array_equal(padded_3d, expected_3d)
 
 def test_pad_tensor_3D_padding_fill_value_9():
@@ -73,5 +73,6 @@ def test_pad_tensor_3D_padding_fill_value_9():
         [[9, 9, 9, 9], [9, 5, 6, 9], [9, 7, 8, 9], [9, 9, 9, 9]],
         [[9, 9, 9, 9], [9, 9, 9, 9], [9, 9, 9, 9], [9, 9, 9, 9]]
     ])
-    padded_3d = pad_tensor(tensor_3d, padding_offset=1, padding_fill_value=9)
+    padded_3d = pad_tensor(tensor_3d, padding=1, fill_value=9)
     np.testing.assert_array_equal(padded_3d, expected_3d)
+
