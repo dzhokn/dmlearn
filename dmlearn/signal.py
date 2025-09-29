@@ -95,10 +95,47 @@ def __calculate_num_of_chunks(tensor: np.ndarray, chunk_size: int, step_size: in
     # Calculate the number of chunks within a single tensor matrix:
     # - 1+size_diff // step_size: the number of chunks in a single matrix row
     # - 1+size_diff // step_size: the number of chunks in a single matrix column
-    num_of_chunks_in_row = 1 + (tensor.shape[0] - chunk_size) // step_size
-    num_of_chunks_in_col = 1 + (tensor.shape[1] - chunk_size) // step_size
+    # * tensor.shape[-2] is the number of columns of the last matrix in the tensor
+    # * tensor.shape[-1] is the number of rows of the last matrix in the tensor
+    num_of_chunks_in_row = 1 + (tensor.shape[-2] - chunk_size) // step_size
+    num_of_chunks_in_col = 1 + (tensor.shape[-1] - chunk_size) // step_size
     # If the number of chunks in a row or column is 0, set it to 1 (we always have at least one chunk)
     num_of_chunks_in_row = max(1, num_of_chunks_in_row)
     num_of_chunks_in_col = max(1, num_of_chunks_in_col)
     # Return the number of chunks in a row and the number of chunks in a column
     return num_of_chunks_in_row, num_of_chunks_in_col
+
+def correlate_tensor(tensor: np.ndarray, kernel: np.ndarray, step_size: int = 1, padding: int = 0, fill_value: float = 0.0) -> np.ndarray:
+    """
+    Correlate a tensor with a kernel. The correlation is calculated by sliding a window of size kernel.shape[0] x kernel.shape[1] across the tensor.
+    IMPORTANT: This method only supports 2D and 3D tensors. They could be symmetric or asymmetric (e.g. 17x3x3, 5x2x2, etc.).
+    However, the kernel must always be symmetric (2x2, 3x3, etc.).
+
+    Args:
+        tensor: The tensor to correlate (e.g. [[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+        kernel: The kernel to correlate with (e.g. [[0, 0],[0, 1]])
+        step_size: The step size to use when chunking the tensor (default=1)
+        padding: The number of elements to pad the tensor with (default=0)
+
+    Returns:
+        The correlated tensor (e.g. [[5, 6], [8, 9]]).
+        The output is a tensor with the same first dimension as the input tensor.
+        The second and third dimensions are the sqrt of the number of chunks in a single matrix.
+    """
+    # Pad the tensor
+    tensor = pad_tensor(tensor, padding, fill_value)
+    # Chunk the tensor
+    chunks = chunk_tensor(tensor, kernel.shape[0], step_size)
+    num_of_chunks_in_single_matrix = chunks.shape[-3]  # The number of chunks that were produced out from a single matrix (3D tensors has N matrices).
+    output_matrix_size = int(np.sqrt(num_of_chunks_in_single_matrix))
+    # Correlate the chunks with the kernel
+    # CASE 1: 2D tensor correlated with 2D kernel
+    if tensor.ndim == 2:
+        output = np.sum(chunks * kernel, axis=(1,2))
+        output = output.reshape(output_matrix_size, output_matrix_size) # We need to convert a flat array into a 2D matrix.
+    # CASE 2: 3D tensor
+    else:
+        output = np.sum(chunks * kernel, axis=(2,3))
+        # We need to convert 'k' flat arrays into 'k' 2D matrices, where 'k' is the rank of the first tensor's dimension.
+        output = output.reshape(tensor.shape[0], output_matrix_size, output_matrix_size)
+    return output

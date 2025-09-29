@@ -1,5 +1,5 @@
 import numpy as np
-from dmlearn.signal import chunk_tensor, pad_tensor
+from dmlearn.signal import chunk_tensor, pad_tensor, correlate_tensor
 
 def test_pad_tensor_2D_offset_1():
     """Test the pad_tensor function with various inputs."""
@@ -406,3 +406,167 @@ def test_chunk_tensor_4x4x4_chunk_size_4_step_size_4():
     chunked_3d = chunk_tensor(tensor_3d, chunk_size=4, step_size=4)
     np.testing.assert_array_equal(chunked_3d.shape, (4, 1, 4, 4))
     np.testing.assert_array_equal(chunked_3d, expected_3d)
+
+def test_correlate_tensor_symmetric_3x3_tensor_default_args():
+    tensor_2d = np.array([[1, 2, 3], [4, 5, 6], [1, 2, 3]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[5, 6], [2, 3]])
+    output = correlate_tensor(tensor_2d, kernel)
+    np.testing.assert_array_equal(output.shape, (2, 2))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3_tensor_step_size_2():
+    tensor_2d = np.array([[1, 2, 3], [4, 5, 6], [1, 2, 3]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[5]])
+    output = correlate_tensor(tensor_2d, kernel, step_size=2)
+    np.testing.assert_array_equal(output.shape, (1, 1))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3_tensor_padding_1():
+    tensor_2d = np.array([[1, 2, 3], [4, 5, 6], [1, 2, 3]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[1, 2, 3, 0], [4, 5, 6, 0], [1, 2, 3, 0], [0, 0, 0, 0]])
+    output = correlate_tensor(tensor_2d, kernel, padding=1)
+    np.testing.assert_array_equal(output.shape, (4, 4))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3_tensor_step_size_2_padding_1():
+    tensor_2d = np.array([[1, 2, 3], [4, 5, 6], [1, 2, 3]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[1, 3], [1, 3]])
+    output = correlate_tensor(tensor_2d, kernel, step_size=2, padding=1)
+    np.testing.assert_array_equal(output.shape, (2, 2))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3_tensor_3x3_kernel_step_size_2_padding_1():
+    tensor_2d = np.array([[1, 2, 3], [4, 5, 6], [1, 2, 3]])
+    kernel = np.array([[0, 0, 0],[0, 1, 1], [0, 0, 0]])
+    expected = np.array([[3, 3], [3, 3]])
+    output = correlate_tensor(tensor_2d, kernel, step_size=2, padding=1)
+    np.testing.assert_array_equal(output.shape, (2, 2))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3x3_tensor_default_args():
+    tensor_3d = np.array([[[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[[5, 6], [2, 3]], [[5, 6], [2, 3]], [[5, 6], [2, 3]]])
+    output = correlate_tensor(tensor_3d, kernel)
+    np.testing.assert_array_equal(output.shape, (3, 2, 2))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3x3_tensor_step_size_2():
+    tensor_3d = np.array([[[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[[5]], [[5]], [[5]]])
+    output = correlate_tensor(tensor_3d, kernel, step_size=2)
+    np.testing.assert_array_equal(output.shape, (3, 1, 1))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3x3_tensor_padding_1():
+    tensor_3d = np.array([[[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]],
+                        [[1, 2, 3, 0], [4, 5, 6, 0], [1, 2, 3, 0], [0, 0, 0, 0]],
+                        [[1, 2, 3, 0], [4, 5, 6, 0], [1, 2, 3, 0], [0, 0, 0, 0]],
+                        [[1, 2, 3, 0], [4, 5, 6, 0], [1, 2, 3, 0], [0, 0, 0, 0]],
+                        [[0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0], [0, 0, 0, 0]]])
+    output = correlate_tensor(tensor_3d, kernel, padding=1)
+    np.testing.assert_array_equal(output.shape, (5, 4, 4))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3x3_tensor_step_size_2_padding_1():
+    tensor_3d = np.array([[[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[[0, 0], [0, 0]], [[1, 3], [1, 3]], [[1, 3], [1, 3]], [[1, 3], [1, 3]], [[0, 0], [0, 0]]])
+    output = correlate_tensor(tensor_3d, kernel, step_size=2, padding=1)
+    np.testing.assert_array_equal(output.shape, (5, 2, 2))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_3x3x3_tensor_3x3_kernel_step_size_2_padding_1():
+    tensor_3d = np.array([[[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]], [[1, 2, 3], [4, 5, 6], [1, 2, 3]]])
+    kernel = np.array([[0, 0, 0],[0, 1, 1], [0, 0, 0]])
+    expected = np.array([[[0, 0], [0, 0]], [[3, 3], [3, 3]], [[3, 3], [3, 3]], [[3, 3], [3, 3]], [[0, 0], [0, 0]]])
+    output = correlate_tensor(tensor_3d, kernel, step_size=2, padding=1)
+    np.testing.assert_array_equal(output.shape, (5, 2, 2))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_4x4x4_tensor_default_args():
+    tensor_3d = np.array([[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]])
+    kernel = np.array([[1, 0],[0, 1]])
+    expected = np.array([[[7, 9, 11], [15, 17, 19], [23, 25, 27]],
+                        [[7, 9, 11], [15, 17, 19], [23, 25, 27]],
+                        [[7, 9, 11], [15, 17, 19], [23, 25, 27]],
+                        [[7, 9, 11], [15, 17, 19], [23, 25, 27]]])
+    output = correlate_tensor(tensor_3d, kernel)
+    np.testing.assert_array_equal(output.shape, (4, 3, 3))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_4x4x4_tensor_step_size_2():
+    tensor_3d = np.array([[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]])
+    kernel = np.array([[1, 0],[0, 1]])
+    expected = np.array([[[7, 11], [23, 27]],
+                        [[7, 11], [23, 27]],
+                        [[7, 11], [23, 27]],
+                        [[7, 11], [23, 27]]])
+    output = correlate_tensor(tensor_3d, kernel, step_size=2)
+    np.testing.assert_array_equal(output.shape, (4, 2, 2))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_symmetric_4x4x4_tensor_step_size_2_padding_1():
+    tensor_3d = np.array([[[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]],
+                        [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]])
+    kernel = np.array([[1, 0],[0, 1]])
+    expected = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                        [[1, 3, 0], [9, 17, 8], [0, 14, 16]],
+                        [[1, 3, 0], [9, 17, 8], [0, 14, 16]],
+                        [[1, 3, 0], [9, 17, 8], [0, 14, 16]],
+                        [[1, 3, 0], [9, 17, 8], [0, 14, 16]],
+                        [[0, 0, 0], [0, 0, 0], [0, 0, 0]]])
+    output = correlate_tensor(tensor_3d, kernel, step_size=2, padding=1)
+    np.testing.assert_array_equal(output.shape, (6, 3, 3))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_asymmetric_5x2x2_tensor_default_args():
+    tensor = np.array([[[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]]])
+    kernel = np.array([[0, 0],[0, 1]])
+    expected = np.array([[[5]], [[5]], [[5]], [[5]], [[5]]])
+    output = correlate_tensor(tensor, kernel)
+    np.testing.assert_array_equal(output.shape, (5, 1, 1))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_asymmetric_5x2x2_tensor_padding_1():
+    tensor = np.array([[[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]]])
+    kernel = np.array([[0, 0,],[0, 1]])
+    expected = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+                        [[1, 2, 0], [4, 5, 0], [0, 0, 0]],
+                        [[1, 2, 0], [4, 5, 0], [0, 0, 0]],
+                        [[1, 2, 0], [4, 5, 0], [0, 0, 0]],
+                        [[1, 2, 0], [4, 5, 0], [0, 0, 0]],
+                        [[1, 2, 0], [4, 5, 0], [0, 0, 0]],
+                        [[0, 0, 0], [0, 0, 0], [0, 0, 0]]])
+    output = correlate_tensor(tensor, kernel, padding=1)
+    np.testing.assert_array_equal(output.shape, (7, 3, 3))
+    np.testing.assert_array_equal(output, expected)
+
+def test_correlate_tensor_asymmetric_5x2x2_tensor_step_size_2_padding_1():
+    tensor = np.array([[[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]], [[1, 2], [4, 5]]])
+    kernel = np.array([[0, 0,],[0, 1]])
+    expected = np.array([[[0, 0], [0, 0]],
+                        [[1, 0], [0, 0]],
+                        [[1, 0], [0, 0]],
+                        [[1, 0], [0, 0]],
+                        [[1, 0], [0, 0]],
+                        [[1, 0], [0, 0]],
+                        [[0, 0], [0, 0]]])
+    output = correlate_tensor(tensor, kernel, step_size=2, padding=1)
+    np.testing.assert_array_equal(output.shape, (7, 2, 2))
+    np.testing.assert_array_equal(output, expected)
