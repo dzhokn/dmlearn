@@ -139,3 +139,12 @@ def correlate_tensor(tensor: np.ndarray, kernel: np.ndarray, step_size: int = 1,
         # We need to convert 'k' flat arrays into 'k' 2D matrices, where 'k' is the rank of the first tensor's dimension.
         output = output.reshape(tensor.shape[0], output_matrix_size, output_matrix_size)
     return output
+
+def convolve_tensor(tensor: np.ndarray, kernel: np.ndarray, step_size: int = 1, padding: int = 0, fill_value: float = 0.0) -> np.ndarray:
+    """
+    Convolve a tensor with a kernel. The convolution is calculated by sliding a window of size kernel.shape[0] x kernel.shape[1] across the tensor.
+    IMPORTANT: This method only supports 2D and 3D tensors. They could be symmetric or asymmetric (e.g. 17x3x3, 5x2x2, etc.).
+    However, the kernel must always be symmetric (2x2, 3x3, etc.).
+    """
+    # Simply correlate the tensor with the *flipped* kernel
+    return correlate_tensor(tensor, np.flip(kernel), step_size, padding, fill_value)
